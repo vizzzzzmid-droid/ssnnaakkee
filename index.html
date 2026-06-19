@@ -285,19 +285,23 @@
   }
 
   // --- ФУНКЦИЯ ОТПРАВКИ РЕКОРДА ---
-  function sendScore(score) {
+  async function sendScore(score) {
     const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
     if (!user) return;
     
-    fetch('https://muddy-paper-a92d.envoselov.workers.dev/save-score', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({
-            userId: user.id,
-            name: user.first_name,
-            score: score
-        })
-    }).catch(err => console.error('Ошибка отправки рекорда:', err));
+    try {
+        await fetch('https://muddy-paper-a92d.envoselov.workers.dev/save-score', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                userId: user.id,
+                name: user.first_name,
+                score: score
+            })
+        });
+    } catch (err) {
+        console.error('Ошибка отправки рекорда:', err);
+    }
   }
 
   const canvas = document.getElementById('canvas');
@@ -316,7 +320,11 @@
     document.getElementById('level-display').textContent = level;
   }
 
-  function showOverlay(title, score, best, btnText) {
+  // НОВАЯ, улучшенная версия:
+  async function showOverlay(title, score, best, btnText) {
+    // Сначала отправляем рекорд и ждем ответа
+    await sendScore(score); 
+
     const overlay = document.getElementById('overlay');
     const titleEl = document.getElementById('overlay-title');
     const subEl = document.getElementById('overlay-sub');
@@ -326,9 +334,6 @@
     subEl.innerHTML = `score <span>${score}</span> &nbsp;·&nbsp; best <span>${best}</span>`;
     btn.textContent = btnText;
     overlay.classList.remove('hidden');
-    
-    // ОТПРАВЛЯЕМ РЕКОРД ПРИ КОНЦЕ ИГРЫ
-    sendScore(score);
   }
 
   // --- SNAKE GAME ---
