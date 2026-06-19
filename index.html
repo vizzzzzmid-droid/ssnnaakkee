@@ -312,6 +312,23 @@
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
   
+  // --- AUDIO ---
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  function playLineClearSound() {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1);
+    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+    osc.start();
+    osc.stop(audioCtx.currentTime + 0.3);
+  }
+
   // Game Manager
   let currentGame = 'snake';
   let gameLoop = null;
@@ -477,6 +494,7 @@
       }
     },
     triggerLineEffect(row) {
+      playLineClearSound(); // Добавлено воспроизведение звука
       const particles = [];
       for(let i=0; i<this.COLS; i++) {
         particles.push({
