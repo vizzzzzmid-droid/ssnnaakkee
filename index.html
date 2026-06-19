@@ -285,7 +285,7 @@
   }
 
   // --- ФУНКЦИЯ ОТПРАВКИ РЕКОРДА ---
-  async function sendScore(score) {
+  async function sendScore(score, gameName) {
     const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
     if (!user) return;
     
@@ -296,7 +296,8 @@
             body: JSON.stringify({
                 userId: user.id,
                 name: user.first_name,
-                score: score
+                score: score,
+                game: gameName // Добавляем название игры
             })
         });
     } catch (err) {
@@ -323,7 +324,7 @@
   // НОВАЯ, улучшенная версия:
   async function showOverlay(title, score, best, btnText) {
     // Сначала отправляем рекорд и ждем ответа
-    await sendScore(score); 
+    await sendScore(score, currentGame); 
 
     const overlay = document.getElementById('overlay');
     const titleEl = document.getElementById('overlay-title');
