@@ -440,11 +440,17 @@
       updateHUD(this.score, this.best, this.level);
     },
     spawnPiece() {
-      const shapes = [
-        [[1,1,1,1]], [[1,1],[1,1]], [[1,1,1],[0,1,0]], [[1,1,1],[1,0,0]], [[1,1,1],[0,0,1]], [[1,1,0],[0,1,1]], [[0,1,1],[1,1,0]]
+      const pieces = [
+        {shape: [[1,1,1,1]], color: '#ff4466'},
+        {shape: [[1,1],[1,1]], color: '#00ff88'},
+        {shape: [[1,1,1],[0,1,0]], color: '#0088ff'},
+        {shape: [[1,1,1],[1,0,0]], color: '#ffff00'},
+        {shape: [[1,1,1],[0,0,1]], color: '#ff8800'},
+        {shape: [[1,1,0],[0,1,1]], color: '#aa00ff'},
+        {shape: [[0,1,1],[1,1,0]], color: '#ffffff'}
       ];
-      const shape = shapes[Math.floor(Math.random()*shapes.length)];
-      this.piece = {shape, x: Math.floor(this.COLS/2)-1, y: 0};
+      const pieceData = pieces[Math.floor(Math.random()*pieces.length)];
+      this.piece = {shape: pieceData.shape, color: pieceData.color, x: Math.floor(this.COLS/2)-1, y: 0};
     },
     step() {
       if (!this.running) return;
@@ -469,18 +475,18 @@
     checkCollision(x, y, shape) {
       for (let r=0; r<shape.length; r++) {
         for (let c=0; c<shape[r].length; c++) {
-          if (shape[r][c] && (this.board[y+r] === undefined || this.board[y+r][x+c] === undefined || this.board[y+r][x+c])) return true;
+          if (shape[r][c] && (this.board[y+r] === undefined || this.board[y+r][x+c] === undefined || this.board[y+r][x+c] !== 0)) return true;
         }
       }
       return false;
     },
     lockPiece() {
-      this.piece.shape.forEach((row, r) => row.forEach((val, c) => { if(val) this.board[this.piece.y+r][this.piece.x+c] = 1; }));
+      this.piece.shape.forEach((row, r) => row.forEach((val, c) => { if(val) this.board[this.piece.y+r][this.piece.x+c] = this.piece.color; }));
     },
     clearLines() {
       let lines = 0;
       for (let r=this.ROWS-1; r>=0; r--) {
-        if (this.board[r].every(c => c)) {
+        if (this.board[r].every(c => c !== 0)) {
           this.board.splice(r, 1);
           this.board.unshift(Array(this.COLS).fill(0));
           this.triggerLineEffect(r);
@@ -532,10 +538,10 @@
       for (let x=0; x<=this.COLS; x++) { ctx.beginPath(); ctx.moveTo(x*this.CELL, 0); ctx.lineTo(x*this.CELL, canvas.height); ctx.stroke(); }
       for (let y=0; y<=this.ROWS; y++) { ctx.beginPath(); ctx.moveTo(0, y*this.CELL); ctx.lineTo(canvas.width, y*this.CELL); ctx.stroke(); }
       // Board
-      ctx.fillStyle = '#00ff88';
-      this.board.forEach((row, r) => row.forEach((val, c) => { if(val) ctx.fillRect(c*this.CELL+1, r*this.CELL+1, this.CELL-2, this.CELL-2); }));
+      this.board.forEach((row, r) => row.forEach((val, c) => { if(val) { ctx.fillStyle = val; ctx.fillRect(c*this.CELL+1, r*this.CELL+1, this.CELL-2, this.CELL-2); }}));
       // Piece
       if (this.piece) {
+        ctx.fillStyle = this.piece.color;
         this.piece.shape.forEach((row, r) => row.forEach((val, c) => { if(val) ctx.fillRect((this.piece.x+c)*this.CELL+1, (this.piece.y+r)*this.CELL+1, this.CELL-2, this.CELL-2); }));
       }
     },
