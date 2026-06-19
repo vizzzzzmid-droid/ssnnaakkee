@@ -284,6 +284,22 @@
     Telegram.WebApp.expand();
   }
 
+  // --- ФУНКЦИЯ ОТПРАВКИ РЕКОРДА ---
+  function sendScore(score) {
+    const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    if (!user) return;
+    
+    fetch('https://muddy-paper-a92d.envoselov.workers.dev/save-score', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            userId: user.id,
+            name: user.first_name,
+            score: score
+        })
+    }).catch(err => console.error('Ошибка отправки рекорда:', err));
+  }
+
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
   
@@ -310,6 +326,9 @@
     subEl.innerHTML = `score <span>${score}</span> &nbsp;·&nbsp; best <span>${best}</span>`;
     btn.textContent = btnText;
     overlay.classList.remove('hidden');
+    
+    // ОТПРАВЛЯЕМ РЕКОРД ПРИ КОНЦЕ ИГРЫ
+    sendScore(score);
   }
 
   // --- SNAKE GAME ---
