@@ -287,13 +287,10 @@
   // --- ФУНКЦИЯ ОТПРАВКИ РЕКОРДА ---
   async function sendScore(score, gameName) {
     const user = window.Telegram?.WebApp?.initDataUnsafe?.user;
-    if (!user) {
-      console.log('Telegram user not found, score not sent');
-      return;
-    }
+    if (!user) return;
     
     try {
-        const response = await fetch('https://muddy-paper-a92d.envoselov.workers.dev/save-score', {
+        await fetch('https://muddy-paper-a92d.envoselov.workers.dev/save-score', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -303,13 +300,6 @@
                 game: gameName // Добавляем название игры
             })
         });
-        
-        const result = await response.json();
-        if (result.saved) {
-            console.log('✓ Новый рекорд сохранён:', score);
-        } else {
-            console.log('✗ Результат не лучше предыдущего:', score);
-        }
     } catch (err) {
         console.error('Ошибка отправки рекорда:', err);
     }
