@@ -322,9 +322,9 @@
   }
 
   // НОВАЯ, улучшенная версия:
-  async function showOverlay(title, score, best, btnText) {
+  async function showOverlay(title, score, best, btnText, gameType) {
     // Сначала отправляем рекорд и ждем ответа
-    await sendScore(score, currentGame); 
+    await sendScore(score, gameType); 
 
     const overlay = document.getElementById('overlay');
     const titleEl = document.getElementById('overlay-title');
@@ -375,7 +375,7 @@
       this.running = false;
       if (this.score > this.best) { this.best = this.score; localStorage.setItem('snake_best', this.best); }
       clearInterval(gameLoop);
-      showOverlay('GAME OVER', this.score, this.best, 'RETRY');
+      showOverlay('GAME OVER', this.score, this.best, 'RETRY', 'snake');
     },
     draw() {
       ctx.fillStyle = '#0a0a0f'; ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -502,7 +502,7 @@
       this.running = false;
       if (this.score > this.best) { this.best = this.score; localStorage.setItem('tetris_best', this.best); }
       clearInterval(gameLoop);
-      showOverlay('GAME OVER', this.score, this.best, 'RETRY');
+      showOverlay('GAME OVER', this.score, this.best, 'RETRY', 'tetris');
     },
     draw() {
       ctx.fillStyle = '#0a0a0f'; ctx.fillRect(0, 0, canvas.width, canvas.height);
